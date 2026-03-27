@@ -1,34 +1,61 @@
 import type { AppLoadContext, EntryContext } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
-import { renderToReadableStream } from "react-dom/server";
+import { PassThrough } from "node:stream";
+import pkg from "react-dom/server";
+const { renderToPipeableStream } = pkg;
 
-export default async function handleRequest(
+export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
-  loadContext: AppLoadContext
+  _loadContext: AppLoadContext
 ) {
-  const body = await renderToReadableStream(
-    <RemixServer context={remixContext} url={request.url} />,
-    {
-      signal: request.signal,
-      onError(error: unknown) {
-        console.error(error);
-        responseStatusCode = 500;
-      },
-    }
-  );
+  const isBot = isbot(request.headers.get("user-agent") || "");
 
-  if (isbot(request.headers.get("user-agent") || "")) {
-    await body.allReady;
-  }
+  return new Promise((resolve, reject) => {
+    let didError = false;
 
-  responseHeaders.set("Content-Type", "text/html");
+    const { pipe, abort } = renderToPipeableStream(
+      <RemixServer context={remixContext} url={request.url} />,
+      {
+        onAllReady() {
+          if (isBot) {
+            const passThrough = new PassThrough();
+            responseHeaders.set("Content-Type", "text/html");
+            resolve(
+              new Response(passThrough as unknown as ReadableStream, {
+                headers: responseHeaders,
+                status: didError ? 500 : responseStatusCode,
+              })
+            );
+            pipe(passThrough);
+          }
+        },
+        onShellReady() {
+          if (!isBot) {
+            const passThrough = new PassThrough();
+            responseHeaders.set("Content-Type", "text/html");
+            resolve(
+              new Response(passThrough as unknown as ReadableStream, {
+                headers: responseHeaders,
+                status: didError ? 500 : responseStatusCode,
+              })
+            );
+            pipe(passThrough);
+          }
+        },
+        onShellError(error: unknown) {
+          reject(error);
+        },
+        onError(error: unknown) {
+          didError = true;
+          console.error(error);
+        },
+      }
+    );
 
-  return new Response(body, {
-    headers: responseHeaders,
-    status: responseStatusCode,
+    request.signal.addEventListener("abort", abort);
   });
 }
