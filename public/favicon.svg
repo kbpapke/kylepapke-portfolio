@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#0D0F0A"/>
+  <!-- Isometric cube in pixel art style -->
+  <!-- Top face -->
+  <polygon points="16,4 28,10 16,16 4,10" fill="#39FF14"/>
+  <!-- Left face -->
+  <polygon points="4,10 16,16 16,28 4,22" fill="#1a7a00"/>
+  <!-- Right face -->
+  <polygon points="28,10 16,16 16,28 28,22" fill="#2a9a00"/>
+  <!-- Pixel dots -->
+  <rect x="14" y="7" width="2" height="2" fill="#0D0F0A" opacity="0.4"/>
+</svg>

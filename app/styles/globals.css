@@ -1,0 +1,315 @@
+@import "tailwindcss";
+
+/* ── Design tokens ─────────────────────────────────────────── */
+@theme {
+  --color-bg: #0d0f0a;
+  --color-bg-2: #141a0f;
+  --color-tile: #1c2b16;
+  --color-wall: #0a120a;
+  --color-primary: #39ff14;
+  --color-primary-dim: #1a7a00;
+  --color-primary-glow: rgba(57, 255, 20, 0.35);
+  --color-accent: #ff6b35;
+  --color-accent-dim: #7a3010;
+  --color-cyan: #4ec9e1;
+  --color-purple: #a855f7;
+  --color-amber: #f59e0b;
+  --color-text: #c8ff96;
+  --color-text-muted: #6b8a5a;
+  --color-text-dim: #3d5a2a;
+  --color-border: rgba(57, 255, 20, 0.2);
+  --color-border-bright: rgba(57, 255, 20, 0.5);
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  --radius-pixel: 0px;
+  --shadow-pixel: 2px 2px 0 0 var(--color-primary-dim);
+  --shadow-glow: 0 0 20px var(--color-primary-glow), 0 0 40px rgba(57, 255, 20, 0.1);
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 64px;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Pixel panel component ─────────────────────────────────── */
+.pixel-panel {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+
+.pixel-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 1px 1px 0 rgba(57, 255, 20, 0.15),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.pixel-panel-bright {
+  border-color: var(--color-border-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ── Pixel border (box-shadow technique) ───────────────────── */
+.pixel-border {
+  box-shadow:
+    0 -2px 0 0 var(--color-primary),
+    0 2px 0 0 var(--color-primary),
+    -2px 0 0 0 var(--color-primary),
+    2px 0 0 0 var(--color-primary);
+}
+
+/* ── Pixel button ──────────────────────────────────────────── */
+.pixel-btn {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  box-shadow:
+    inset -2px -2px 0 var(--color-primary-dim),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.pixel-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow:
+    1px 1px 0 var(--color-primary-dim),
+    2px 2px 0 var(--color-primary-dim),
+    inset -2px -2px 0 var(--color-primary-dim),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.pixel-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow:
+    inset 2px 2px 0 var(--color-primary-dim);
+}
+
+.pixel-btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  box-shadow: none;
+}
+
+.pixel-btn-outline:hover {
+  background: rgba(57, 255, 20, 0.08);
+  box-shadow: var(--shadow-glow);
+}
+
+.pixel-btn-accent {
+  background: var(--color-accent);
+  color: white;
+  box-shadow:
+    inset -2px -2px 0 var(--color-accent-dim),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* ── Section headings ──────────────────────────────────────── */
+.section-heading {
+  font-family: var(--font-pixel);
+  font-size: clamp(10px, 2vw, 14px);
+  color: var(--color-primary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-heading::before {
+  content: "▶";
+  font-size: 0.7em;
+}
+
+.section-heading::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--color-border-bright), transparent);
+}
+
+/* ── Tag/badge component ───────────────────────────────────── */
+.pixel-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(57, 255, 20, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(57, 255, 20, 0.25);
+  display: inline-block;
+}
+
+/* ── Scanline overlay ──────────────────────────────────────── */
+.scanlines {
+  position: relative;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Glow text ─────────────────────────────────────────────── */
+.glow-text {
+  text-shadow:
+    0 0 10px var(--color-primary),
+    0 0 20px var(--color-primary),
+    0 0 40px rgba(57, 255, 20, 0.5);
+}
+
+.glow-text-subtle {
+  text-shadow: 0 0 12px rgba(57, 255, 20, 0.4);
+}
+
+/* ── Neon line ─────────────────────────────────────────────── */
+.neon-line {
+  height: 1px;
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary), 0 0 12px rgba(57, 255, 20, 0.3);
+}
+
+/* ── Pixel cursor blink ────────────────────────────────────── */
+.pixel-cursor::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Float animation ───────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.float { animation: float 3s ease-in-out infinite; }
+.float-slow { animation: float-slow 5s ease-in-out infinite; }
+
+/* ── Pixel character walk ──────────────────────────────────── */
+@keyframes char-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.char-idle { animation: char-idle 1.2s steps(2) infinite; }
+
+/* ── Flicker (neon sign effect) ────────────────────────────── */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    text-shadow:
+      0 0 10px var(--color-primary),
+      0 0 20px var(--color-primary);
+  }
+  20%, 24%, 55% {
+    opacity: 0.6;
+    text-shadow: none;
+  }
+}
+
+.flicker { animation: flicker 4s infinite; }
+
+/* ── Scroll fade-in ────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* ── Iso room specific ─────────────────────────────────────── */
+.iso-room {
+  image-rendering: pixelated;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary-dim);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* ── Selection ─────────────────────────────────────────────── */
+::selection {
+  background: rgba(57, 255, 20, 0.25);
+  color: var(--color-primary);
+}
+
+/* ── Mobile base overrides ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .section-heading {
+    font-size: 9px;
+  }
+}
