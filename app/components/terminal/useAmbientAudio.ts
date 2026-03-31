@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export type SceneName = 'aquarium' | 'space' | 'matrix'
+export type SceneName = 'aquarium' | 'space' | 'matrix' | 'beach' | 'sky'
 
 // ── Aquarium: deep underwater drone with beating harmonics + occasional bubble blips ──
 function buildAquariumAudio(ac: AudioContext): AudioNode[] {
@@ -168,6 +168,90 @@ function buildMatrixAudio(ac: AudioContext): AudioNode[] {
   ]
 }
 
+// ── Beach: soft wave hush + occasional foam tick ──
+function buildBeachAudio(ac: AudioContext): AudioNode[] {
+  const master = ac.createGain(); master.gain.value = 0
+  master.connect(ac.destination)
+
+  // pink-ish noise approximation: white noise through lowpass
+  const bufferSize = ac.sampleRate * 2
+  const noiseBuffer = ac.createBuffer(1, bufferSize, ac.sampleRate)
+  const data = noiseBuffer.getChannelData(0)
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1
+  const noise = ac.createBufferSource(); noise.buffer = noiseBuffer; noise.loop = true
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = 0.7
+  const ng = ac.createGain(); ng.gain.value = 0.06
+  noise.connect(lp); lp.connect(ng); ng.connect(master)
+  noise.start()
+
+  // distant swell: slow triangle
+  const swell = ac.createOscillator(); swell.type = 'triangle'; swell.frequency.value = 0.08
+  const swellG = ac.createGain(); swellG.gain.value = 0.02
+  swell.connect(swellG); swellG.connect(master)
+  swell.start()
+
+  // foam tick: rare short click
+  let foamTimeout: ReturnType<typeof setTimeout>
+  function scheduleFoam() {
+    const delay = 2200 + Math.random() * 7000
+    foamTimeout = setTimeout(() => {
+      if (ac.state === 'closed') return
+      const osc = ac.createOscillator(); osc.type = 'sine'; osc.frequency.value = 900 + Math.random() * 900
+      const env = ac.createGain()
+      env.gain.setValueAtTime(0, ac.currentTime)
+      env.gain.linearRampToValueAtTime(0.03, ac.currentTime + 0.004)
+      env.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.12)
+      osc.connect(env); env.connect(master)
+      osc.start(); osc.stop(ac.currentTime + 0.13)
+      scheduleFoam()
+    }, delay)
+  }
+  scheduleFoam()
+
+  master.gain.setTargetAtTime(1, ac.currentTime, 1.8)
+
+  return [
+    noise, lp, swell, master,
+    { disconnect() { clearTimeout(foamTimeout) } } as unknown as AudioNode,
+  ]
+}
+
+// ── Sky: airy wind band + distant engine hum ──
+function buildSkyAudio(ac: AudioContext): AudioNode[] {
+  const master = ac.createGain(); master.gain.value = 0
+  master.connect(ac.destination)
+
+  // bandpassed noise = wind
+  const bufferSize = ac.sampleRate * 2
+  const noiseBuffer = ac.createBuffer(1, bufferSize, ac.sampleRate)
+  const data = noiseBuffer.getChannelData(0)
+  for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1
+  const noise = ac.createBufferSource(); noise.buffer = noiseBuffer; noise.loop = true
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 420; bp.Q.value = 0.9
+  const windG = ac.createGain(); windG.gain.value = 0.05
+  noise.connect(bp); bp.connect(windG); windG.connect(master)
+  noise.start()
+
+  // subtle pitch drift on wind band
+  const lfo = ac.createOscillator(); lfo.type = 'sine'; lfo.frequency.value = 0.05
+  const lfoG = ac.createGain(); lfoG.gain.value = 80
+  lfo.connect(lfoG); lfoG.connect(bp.frequency)
+  lfo.start()
+
+  // distant engine hum: two detuned sines
+  const e1 = ac.createOscillator(); e1.type = 'sine'; e1.frequency.value = 92
+  const e2 = ac.createOscillator(); e2.type = 'sine'; e2.frequency.value = 95
+  const eg1 = ac.createGain(); eg1.gain.value = 0.018
+  const eg2 = ac.createGain(); eg2.gain.value = 0.015
+  e1.connect(eg1); e2.connect(eg2)
+  eg1.connect(master); eg2.connect(master)
+  e1.start(); e2.start()
+
+  master.gain.setTargetAtTime(1, ac.currentTime, 2.2)
+
+  return [noise, bp, lfo, e1, e2, master]
+}
+
 export function useAmbientAudio(scene: SceneName) {
   const [enabled, setEnabled] = useState(false)
   const acRef = useRef<AudioContext | null>(null)
@@ -182,6 +266,8 @@ export function useAmbientAudio(scene: SceneName) {
     if (scene === 'aquarium') nodes = buildAquariumAudio(ac)
     else if (scene === 'space') nodes = buildSpaceAudio(ac)
     else if (scene === 'matrix') nodes = buildMatrixAudio(ac)
+    else if (scene === 'beach') nodes = buildBeachAudio(ac)
+    else if (scene === 'sky') nodes = buildSkyAudio(ac)
     nodesRef.current = nodes
   }, [scene])
 

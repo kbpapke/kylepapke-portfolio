@@ -3,6 +3,8 @@ import { Link } from '@remix-run/react'
 import { buildAquariumScene } from './scenes/aquarium'
 import { buildSpaceScene } from './scenes/space'
 import { buildMatrixScene } from './scenes/matrix'
+import { buildBeachScene } from './scenes/beach'
+import { buildSkyScene } from './scenes/sky'
 import { useAmbientAudio, SceneName } from './useAmbientAudio'
 import { rand } from './sceneUtils'
 import type { SceneDriver, DraggableEntity } from './sceneUtils'
@@ -156,6 +158,18 @@ const WORD_PALETTES: Record<SceneName, Array<[string, string]>> = {
     ['#00D9FF', 'rgba(0,217,255,0.3)'],
     ['#B8FFDA', 'rgba(184,255,218,0.25)'],
   ],
+  beach: [
+    ['#FFB700', 'rgba(255,183,0,0.35)'],
+    ['#FF6B35', 'rgba(255,107,53,0.35)'],
+    ['#00D9FF', 'rgba(0,217,255,0.28)'],
+    ['#00FF87', 'rgba(0,255,135,0.25)'],
+  ],
+  sky: [
+    ['#7DF9FF', 'rgba(125,249,255,0.35)'],
+    ['#00D9FF', 'rgba(0,217,255,0.30)'],
+    ['#B8FFDA', 'rgba(184,255,218,0.25)'],
+    ['#FFFFFF', 'rgba(255,255,255,0.22)'],
+  ],
 }
 
 class WordEntity implements DraggableEntity {
@@ -289,7 +303,9 @@ export function TerminalScene({ scene }: Props) {
     function buildScene(ctx: CanvasRenderingContext2D, W: number, H: number, mobile: boolean) {
       if (scene === 'aquarium') sceneRef.current = buildAquariumScene(ctx, W, H, mobile)
       else if (scene === 'space') sceneRef.current = buildSpaceScene(ctx, W, H, mobile)
-      else sceneRef.current = buildMatrixScene(ctx, W, H, mobile)
+      else if (scene === 'matrix') sceneRef.current = buildMatrixScene(ctx, W, H, mobile)
+      else if (scene === 'beach') sceneRef.current = buildBeachScene(ctx, W, H, mobile)
+      else sceneRef.current = buildSkyScene(ctx, W, H, mobile)
     }
 
     function resize() {
@@ -568,6 +584,8 @@ export function TerminalScene({ scene }: Props) {
     aquarium: { emoji: '🐟', label: 'ocean',  route: '/aquarium' },
     space:    { emoji: '🚀', label: 'space',  route: '/space'    },
     matrix:   { emoji: '⬛', label: 'matrix', route: '/matrix'   },
+    beach:    { emoji: '🏖️', label: 'beach',  route: '/beach'   },
+    sky:      { emoji: '☁️', label: 'sky',    route: '/sky'     },
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
