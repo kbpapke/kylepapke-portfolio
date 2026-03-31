@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Kyle Papke — Senior Software Engineer</title>
+  <meta name="description" content="Kyle Papke · Senior Software Engineer · Ann Arbor, MI · TypeScript, React, Golang, Web3, GraphQL">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green:    #00FF87;
+      --dimgreen: #00994F;
+      --cyan:     #00D9FF;
+      --amber:    #FFB700;
+      --orange:   #FF6B35;
+      --water:    #020C18;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: #0D0D18;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 40%, #0A1A3A 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 60%, #0A0A22 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: none;
+    }
+
+    /* ── macOS menu bar ──────────────────────────────────────── */
+    .menubar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 27px;
+      background: rgba(18, 18, 28, 0.9);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.88);
+      z-index: 200;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .menubar-apple { font-size: 17px; margin-right: 14px; cursor: default; }
+    .menubar-app   { font-weight: 700; margin-right: 18px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    .menubar-items { display: flex; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    .menubar-items span {
+      padding: 0 10px; cursor: default; border-radius: 4px;
+      height: 27px; display: flex; align-items: center;
+    }
+    .menubar-items span:hover { background: rgba(255,255,255,0.12); }
+    .menubar-right {
+      margin-left: auto; display: flex; gap: 14px;
+      color: rgba(255,255,255,0.7); font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* ── Terminal window ─────────────────────────────────────── */
+    .terminal-window {
+      width: min(960px, 96vw);
+      height: min(660px, calc(100vh - 72px));
+      margin-top: 27px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.09),
+        0 30px 80px rgba(0,0,0,0.8),
+        0 0 120px rgba(0,255,135,0.05),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    /* ── Title bar ───────────────────────────────────────────── */
+    .title-bar {
+      height: 40px;
+      background: linear-gradient(180deg, #3A3A3C 0%, #2A2A2C 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(0,0,0,0.6);
+      position: relative;
+    }
+    .traffic-lights { display: flex; gap: 8px; z-index: 1; }
+    .light {
+      width: 13px; height: 13px; border-radius: 50%;
+      position: relative; cursor: default; flex-shrink: 0;
+    }
+    .light.red    { background: #FF5F57; box-shadow: 0 0 5px rgba(255,95,87,0.6); }
+    .light.yellow { background: #FEBC2E; box-shadow: 0 0 5px rgba(254,188,46,0.5); }
+    .light.green  { background: #28C840; box-shadow: 0 0 5px rgba(40,200,64,0.5); }
+    .light::after {
+      content: ''; position: absolute;
+      top: 2px; left: 3px; width: 5px; height: 4px;
+      border-radius: 50%; background: rgba(255,255,255,0.22);
+    }
+    .window-title {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    /* ── Terminal body ───────────────────────────────────────── */
+    .terminal-body {
+      flex: 1; position: relative; overflow: hidden;
+      background: var(--water);
+    }
+
+    canvas#aquarium {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* ── Water surface ───────────────────────────────────────── */
+    .water-surface {
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%, rgba(0,180,255,0.5) 20%,
+        rgba(0,255,180,0.7) 50%, rgba(0,180,255,0.5) 80%, transparent 100%
+      );
+      animation: surface-wave 4s ease-in-out infinite;
+    }
+    @keyframes surface-wave {
+      0%, 100% { opacity: 0.4; transform: scaleX(0.94) translateX(-2%); }
+      50%       { opacity: 0.8; transform: scaleX(1.04) translateX(2%); }
+    }
+
+    /* ── Terminal overlay ────────────────────────────────────── */
+    .terminal-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top,
+        rgba(2, 6, 16, 0.98) 0%,
+        rgba(2, 6, 16, 0.93) 60%,
+        transparent 100%
+      );
+      padding: 10px 18px 14px;
+      display: flex; flex-direction: column;
+      gap: 0; z-index: 10;
+    }
+
+    /* ── Bio strip ───────────────────────────────────────────── */
+    .bio-strip {
+      display: flex; align-items: baseline; flex-wrap: wrap;
+      gap: 0 8px; margin-bottom: 7px; padding-bottom: 7px;
+      border-bottom: 1px solid rgba(0,255,135,0.14);
+    }
+    .bio-name  { color: var(--green); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; }
+    .bio-role  { color: var(--cyan);  font-size: 11px; }
+    .bio-loc   { color: var(--dimgreen); font-size: 10px; }
+    .bio-links { display: flex; gap: 12px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+    .bio-links a {
+      color: var(--amber); font-size: 10.5px;
+      text-decoration: none; opacity: 0.85; transition: opacity 0.15s;
+      user-select: auto;
+    }
+    .bio-links a:hover { opacity: 1; text-decoration: underline; }
+
+    /* ── Nav tabs ────────────────────────────────────────────── */
+    .nav-tabs {
+      display: flex; gap: 2px; margin-bottom: 8px; flex-wrap: wrap;
+    }
+    .tab {
+      background: transparent; border: 1px solid rgba(0,255,135,0.18);
+      color: var(--dimgreen); font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px; padding: 3px 10px; border-radius: 3px;
+      cursor: pointer; letter-spacing: 0.04em;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+    .tab:hover { border-color: rgba(0,255,135,0.45); color: var(--green); }
+    .tab.active {
+      background: rgba(0,255,135,0.12); border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── Output area ─────────────────────────────────────────── */
+    #tlines {
+      display: flex; flex-direction: column; gap: 1px;
+      overflow-y: auto; max-height: 145px;
+      /* selectable so users can copy email/info */
+      user-select: text; -webkit-user-select: text;
+      /* hide scrollbar but allow scroll */
+      scrollbar-width: thin; scrollbar-color: rgba(0,255,135,0.2) transparent;
+      flex: 1;
+    }
+    #tlines::-webkit-scrollbar { width: 3px; }
+    #tlines::-webkit-scrollbar-thumb { background: rgba(0,255,135,0.25); border-radius: 2px; }
+
+    .t-line {
+      font-size: 12px; line-height: 1.65;
+      white-space: pre-wrap; word-break: break-word;
+      letter-spacing: 0.02em; color: var(--green);
+      cursor: text;
+    }
+    .t-line.dim    { color: var(--dimgreen); opacity: 0.75; }
+    .t-line.muted  { color: #2E5A3A; opacity: 0.9; }
+    .t-line.cyan   { color: var(--cyan); }
+    .t-line.amber  { color: var(--amber); }
+    .t-line.orange { color: var(--orange); }
+    .t-line a {
+      color: inherit; text-decoration: underline; text-underline-offset: 2px;
+      opacity: 0.85; user-select: auto;
+    }
+    .t-line a:hover { opacity: 1; }
+
+    /* ── Prompt ──────────────────────────────────────────────── */
+    .prompt-line {
+      display: flex; align-items: center; flex-wrap: wrap;
+      font-size: 12px; margin-top: 4px; letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+    .p-host   { color: var(--green); }
+    .p-sep    { color: var(--dimgreen); margin: 0 1px; }
+    .p-path   { color: var(--cyan); }
+    .p-dollar { color: var(--dimgreen); margin: 0 6px 0 2px; }
+    #typed-input { color: var(--green); }
+    .cursor-block {
+      display: inline-block; width: 8px; height: 13px;
+      background: var(--green); vertical-align: -2px;
+      animation: blink 1.1s step-end infinite;
+      box-shadow: 0 0 8px var(--green);
+    }
+    @keyframes blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+    /* ── Scene switcher ─────────────────────────────────────── */
+    .scene-btns {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      display: flex; gap: 5px; z-index: 2;
+    }
+    .scene-btn {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px; padding: 2px 8px; border-radius: 3px;
+      cursor: pointer; letter-spacing: 0.03em;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      user-select: none;
+    }
+    .scene-btn:hover { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.85); }
+    .scene-btn.active {
+      background: rgba(0,255,135,0.1); border-color: rgba(0,255,135,0.4);
+      color: var(--green);
+    }
+    @media (max-width: 640px) {
+      .scene-btns { right: 8px; }
+      .scene-btn  { font-size: 8.5px; padding: 2px 6px; }
+    }
+
+    /* ── Scanlines + vignette ────────────────────────────────── */
+    .scanlines {
+      position: absolute; inset: 0; pointer-events: none; z-index: 20;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent, transparent 2px,
+        rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+      );
+    }
+    .vignette {
+      position: absolute; inset: 0; pointer-events: none; z-index: 19;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MOBILE  ≤ 640px
+    ══════════════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .menubar { display: none; }
+      body { justify-content: stretch; align-items: stretch; }
+      .terminal-window {
+        width: 100vw; height: 100vh; height: 100dvh;
+        margin-top: 0; border-radius: 0; box-shadow: none;
+      }
+      .title-bar { height: 36px; }
+      .window-title { font-size: 10px; letter-spacing: 0; }
+      .light { width: 11px; height: 11px; }
+      .terminal-overlay { padding: 8px 12px 12px; padding-bottom: env(safe-area-inset-bottom, 12px); }
+      .bio-strip { margin-bottom: 5px; padding-bottom: 5px; }
+      .bio-name  { font-size: 12px; }
+      .bio-role  { font-size: 10px; }
+      .bio-loc   { display: none; }
+      .bio-links { gap: 8px; }
+      .bio-links a { font-size: 10px; }
+      .tab { font-size: 9.5px; padding: 3px 8px; }
+      .t-line { font-size: 10.5px; }
+      #tlines { max-height: 130px; }
+      .prompt-line { font-size: 10.5px; }
+    }
+    @media (max-width: 380px) {
+      .bio-name { font-size: 11px; }
+      .t-line, .prompt-line { font-size: 9.5px; }
+      .bio-links a { font-size: 9px; }
+      .tab { font-size: 9px; padding: 2px 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- macOS menu bar (desktop only) -->
+  <div class="menubar">
+    <span class="menubar-apple">&#xF8FF;</span>
+    <span class="menubar-app">Terminal</span>
+    <div class="menubar-items">
+      <span>Shell</span><span>Edit</span><span>View</span><span>Window</span><span>Help</span>
+    </div>
+    <div class="menubar-right">
+      <span>&#x25BF; WiFi</span>
+      <span id="mb-clock">--:--</span>
+    </div>
+  </div>
+
+  <!-- Terminal window -->
+  <div class="terminal-window">
+
+    <div class="title-bar">
+      <div class="traffic-lights">
+        <span class="light red"></span>
+        <span class="light yellow"></span>
+        <span class="light green"></span>
+      </div>
+      <div class="window-title">kyle@papke — ~/portfolio — bash</div>
+      <div class="scene-btns">
+        <button class="scene-btn active" data-scene="aquarium">🐟 ocean</button>
+        <button class="scene-btn" data-scene="space">🚀 space</button>
+        <button class="scene-btn" data-scene="matrix">⬛ matrix</button>
+      </div>
+    </div>
+
+    <div class="terminal-body">
+      <canvas id="aquarium"></canvas>
+      <div class="water-surface"></div>
+
+      <div class="terminal-overlay">
+
+        <!-- Always-visible bio strip -->
+        <div class="bio-strip">
+          <span class="bio-name">Kyle Papke</span>
+          <span class="bio-role">Senior Software Engineer</span>
+          <span class="bio-loc">Ann Arbor, MI</span>
+          <div class="bio-links">
+            <a href="mailto:kpapke@gmail.com">kpapke@gmail.com</a>
+            <a href="https://linkedin.com/in/kylepapke/" target="_blank" rel="noopener">linkedin</a>
+            <a href="https://kylepapke.xyz" target="_blank" rel="noopener">kylepapke.xyz</a>
+          </div>
+        </div>
+
+        <!-- Navigation tabs -->
+        <div class="nav-tabs">
+          <button class="tab active" data-tab="auto">~/auto</button>
+          <button class="tab" data-tab="about">about</button>
+          <button class="tab" data-tab="skills">skills</button>
+          <button class="tab" data-tab="exp">experience</button>
+          <button class="tab" data-tab="projects">projects</button>
+          <button class="tab" data-tab="contact">contact</button>
+        </div>
+
+        <!-- Terminal output -->
+        <div id="tlines"></div>
+
+        <!-- Live prompt -->
+        <div class="prompt-line">
+          <span class="p-host">kyle</span><span class="p-sep">@</span><span class="p-host">papke</span>
+          <span class="p-sep">:</span><span class="p-path" id="prompt-path">~/portfolio</span>
+          <span class="p-dollar">$</span>
+          <span id="typed-input"></span>
+          <span class="cursor-block"></span>
+        </div>
+
+      </div>
+
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+    </div>
+  </div>
+
+  <script>
+  // ═══════════════════════════════════════════════════════════════════
+  //  KYLE PAPKE — PORTFOLIO TERMINAL
+  //  Aquarium background powered by pretext-inspired per-character
+  //  canvas glyph placement (chenglou.me/pretext).
+  //  Each fish character is individually positioned using measured
+  //  cell widths, creating organic body-flex swim animation at 60fps.
+  // ═══════════════════════════════════════════════════════════════════
+
+  const canvas = document.getElementById('aquarium');
+  const ctx    = canvas.getContext('2d');
+  let W = 0, H = 0;
+
+  const isMobile = () => window.innerWidth <= 640;
+
+  function resize() {
+    const p = canvas.parentElement;
+    W = canvas.width  = p.clientWidth;
+    H = canvas.height = p.clientHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); rebuildScene(); });
+
+
+  // ── Utilities ─────────────────────────────────────────────────────
+
+  const MIRROR = {'>':'<','<':'>','{':'}','}':'{','(':')',')':`(`,'[':']',']':'['};
+  const flip = s => s.split('').reverse().map(c => MIRROR[c] ?? c).join('');
+
+  // Pretext core: measure monospace cell width via canvas (same API pretext uses)
+  function measureCell(size) {
+    ctx.font = `${size}px "JetBrains Mono", monospace`;
+    return ctx.measureText('M').width;
+  }
+
+  const rand    = (a, b) => a + Math.random() * (b - a);
+  const randInt = (a, b) => Math.floor(rand(a, b + 1));
+  const depth   = ()     => rand(44, H - 195);
+
+
+  // ── Fish species ──────────────────────────────────────────────────
+  // Scale sizes down on mobile for performance + legibility
+
+  function getSpecies() {
+    const s = isMobile() ? 0.78 : 1;
+    return [
+      { s: '><{{{°>',  px: Math.round(14*s), c: '#00FF87', g: 'rgba(0,255,135,0.35)',  spd: 55,  amp: 18, n: isMobile() ? 2 : 3 },
+      { s: '><°>',     px: Math.round(12*s), c: '#00FF87', g: 'rgba(0,255,135,0.25)',  spd: 82,  amp: 11, n: isMobile() ? 3 : 4 },
+      { s: '=><{{°>>', px: Math.round(16*s), c: '#FFB700', g: 'rgba(255,183,0,0.30)',  spd: 36,  amp: 23, n: isMobile() ? 1 : 2 },
+      { s: '><(((*>',  px: Math.round(13*s), c: '#00D9FF', g: 'rgba(0,217,255,0.30)',  spd: 67,  amp: 14, n: isMobile() ? 2 : 3 },
+      { s: '>~>',      px: Math.round(10*s), c: '#B8FFDA', g: 'rgba(184,255,218,0.2)', spd: 98,  amp:  8, n: isMobile() ? 3 : 5 },
+      { s: '><{  °>', px: Math.round(18*s), c: '#FF6B35', g: 'rgba(255,107,53,0.32)', spd: 27,  amp: 26, n: 1 },
+      { s: '><((()>',  px: Math.round(13*s), c: '#FF8C42', g: 'rgba(255,140,66,0.28)', spd: 60,  amp: 15, n: isMobile() ? 1 : 2 },
+      { s: '~><{°>',   px: Math.round(11*s), c: '#7DF9FF', g: 'rgba(125,249,255,0.2)', spd: 74,  amp: 12, n: isMobile() ? 1 : 2 },
+    ];
+  }
+
+
+  // ── Fish class ────────────────────────────────────────────────────
+
+  class Fish {
+    constructor(spec, x, y) {
+      this.spec  = spec;
+      this.x     = x; this.y = y; this.baseY = y;
+      this.dir   = Math.random() < 0.5 ? 1 : -1;
+      this.speed = spec.spd * rand(0.72, 1.28);
+      this.phase = rand(0, Math.PI * 2);
+      this.freq  = rand(0.38, 0.70);
+      this.amp   = spec.amp * rand(0.7, 1.3);
+      // Pretext technique: cache cell width once per font/size
+      this.cellW    = measureCell(spec.px);
+      this.fishW    = spec.s.length * this.cellW;
+      this.dragging = false;  // currently held by user
+      this.throwVx  = 0;      // throw momentum X (px/s)
+      this.throwVy  = 0;      // throw momentum Y (px/s)
+    }
+    get chars() { return this.dir < 0 ? flip(this.spec.s) : this.spec.s; }
+    update(dt) {
+      if (this.dragging) {
+        // Panic wiggle while held — phase runs fast, position controlled by pointer
+        this.phase += dt * this.freq * 5;
+        return;
+      }
+      // Throw momentum — decays with ~0.28s half-life then resumes normal swim
+      if (Math.abs(this.throwVx) > 1 || Math.abs(this.throwVy) > 1) {
+        this.x     += this.throwVx * dt;
+        this.baseY += this.throwVy * dt;
+        this.baseY  = Math.max(44, Math.min(H - 195, this.baseY));
+        const decay = Math.pow(0.5, dt / 0.28);
+        this.throwVx *= decay;
+        this.throwVy *= decay;
+      } else {
+        this.throwVx = 0; this.throwVy = 0;
+      }
+      this.phase += dt * this.freq;
+      this.x     += this.speed * this.dir * dt;
+      this.y      = this.baseY + Math.sin(this.phase) * this.amp;
+      const pad = this.fishW + 30;
+      if (this.dir > 0 && this.x >  W + pad) { this.x = -pad;   this.baseY = depth(); }
+      if (this.dir < 0 && this.x < -pad)      { this.x = W + pad; this.baseY = depth(); }
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.font        = `${this.spec.px}px "JetBrains Mono", monospace`;
+      ctx.fillStyle   = this.dragging ? '#FFFFFF' : this.spec.c;
+      ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g;
+      ctx.shadowBlur  = this.dragging ? 24 : 13;
+      const chars = this.chars, len = chars.length;
+      // Pretext-inspired: position each glyph individually with a lagged
+      // sine offset — the tail flexes behind the head like a real fish.
+      // When grabbed, amplitude cranks up for a panic thrash.
+      const wigAmp  = this.dragging ? 6   : 2.2;
+      const wigFreq = this.dragging ? 4.8 : 2.2;
+      for (let i = 0; i < len; i++) {
+        const lag = (this.dir > 0 ? i : len - 1 - i) * 0.28;
+        const cy  = this.y + Math.sin(this.phase * wigFreq + lag) * wigAmp;
+        ctx.fillText(chars[i], this.x + i * this.cellW, cy);
+      }
+      ctx.restore();
+    }
+  }
+
+
+  // ── Bubble class ──────────────────────────────────────────────────
+
+  const BUBBLES = ['○','◦','°','·','˚'];
+  class Bubble {
+    constructor(x, y) {
+      this.x = x + rand(-12, 12); this.y = y;
+      this.g = BUBBLES[randInt(0, BUBBLES.length - 1)];
+      this.sz = rand(8, 15); this.rise = rand(18, 42);
+      this.drift = rand(-6, 6); this.wb = rand(0, Math.PI * 2);
+      this.wf = rand(0.4, 1.0); this.a = rand(0.2, 0.55);
+    }
+    update(dt) {
+      this.wb += dt * this.wf;
+      this.y  -= this.rise * dt;
+      this.x  += (this.drift + Math.sin(this.wb) * 4) * dt;
+    }
+    draw(ctx) {
+      ctx.save(); ctx.globalAlpha = this.a;
+      ctx.font = `${this.sz}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = '#A8D8FF'; ctx.shadowColor = '#00AAFF'; ctx.shadowBlur = 5;
+      ctx.fillText(this.g, this.x, this.y);
+      ctx.restore();
+    }
+    get dead() { return this.y < -20; }
+  }
+
+
+  // ── Seaweed class ─────────────────────────────────────────────────
+
+  class Seaweed {
+    constructor(x) {
+      this.x    = x; this.segs = randInt(4, 9);
+      this.ph   = rand(0, Math.PI * 2); this.spd = rand(0.25, 0.55);
+      this.CELL = 14;
+      const hue = randInt(105, 155);
+      this.cols = Array.from({length: this.segs}, (_, i) =>
+        `hsl(${hue},${60 + i*3}%,${25 + i*3}%)`
+      );
+      this.top = ['ψ','¥','✱','φ','❧'][randInt(0, 4)];
+    }
+    update(dt) { this.ph += dt * this.spd; }
+    draw(ctx) {
+      ctx.save(); ctx.font = `13px "JetBrains Mono", monospace`;
+      for (let i = 0; i < this.segs; i++) {
+        const sw = Math.sin(this.ph + i * 0.35) * (1.5 + i * 0.9);
+        ctx.globalAlpha = 0.45 + 0.55 * (i / this.segs);
+        ctx.fillStyle = this.cols[i]; ctx.shadowColor = this.cols[i]; ctx.shadowBlur = 3;
+        ctx.fillText(i === this.segs - 1 ? this.top : '|',
+          this.x + sw, H - 20 - i * this.CELL);
+      }
+      ctx.restore();
+    }
+  }
+
+
+  // ── Depth-haze text particles ─────────────────────────────────────
+
+  const P_CHARS = '01><{}[]|~°·∴∵≈∞⌈⌉⌊⌋⟨⟩'.split('');
+  class TextParticle {
+    constructor(init) {
+      this.x  = rand(0, W);
+      this.y  = init ? rand(-H, 0) : rand(-30, -5);
+      this.ch = P_CHARS[randInt(0, P_CHARS.length - 1)];
+      this.spd = rand(12, 28); this.a = rand(0.04, 0.11);
+      this.sz = randInt(9, 14);
+      this.col = Math.random() < 0.65 ? '#00FF87' : '#00D9FF';
+    }
+    update(dt) { this.y += this.spd * dt; }
+    draw(ctx) {
+      ctx.save(); ctx.globalAlpha = this.a;
+      ctx.font = `${this.sz}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = this.col;
+      ctx.fillText(this.ch, this.x, this.y);
+      ctx.restore();
+    }
+    get dead() { return this.y > H + 20; }
+  }
+
+
+  // ── Scene state ───────────────────────────────────────────────────
+
+  let fish = [], seaweeds = [], bubbles = [], particles = [];
+  let bubbleT = 0, particleT = 0;
+
+  function buildScene() {
+    fish = []; seaweeds = []; bubbles = []; particles = [];
+    const species = getSpecies();
+    for (const sp of species)
+      for (let i = 0; i < sp.n; i++)
+        fish.push(new Fish(sp, rand(0, W), depth()));
+
+    const swCount = isMobile() ? 10 : 22;
+    for (let i = 0; i < swCount; i++)
+      seaweeds.push(new Seaweed(rand(20, W - 20)));
+
+    const ptCount = isMobile() ? 18 : 35;
+    for (let i = 0; i < ptCount; i++)
+      particles.push(new TextParticle(true));
+  }
+
+  function rebuildScene() { buildScene(); }
+  buildScene();
+
+
+  // ── Background ────────────────────────────────────────────────────
+
+  let causticT = 0;
+  function drawBg(dt) {
+    causticT += dt;
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#010A16'); g.addColorStop(0.4, '#020C1A'); g.addColorStop(1, '#020508');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    // Caustic shafts
+    ctx.save();
+    const shafts = isMobile() ? 4 : 7;
+    for (let i = 0; i < shafts; i++) {
+      const ox = (i / (shafts - 1)) * W + Math.sin(causticT * 0.22 + i * 1.3) * 28;
+      const tx = ox + 8 + Math.sin(causticT * 0.18 + i) * 18;
+      const bw = 14 + Math.sin(causticT * 0.3 + i * 0.8) * 6;
+      const sg = ctx.createLinearGradient(ox, 0, tx, H * 0.65);
+      sg.addColorStop(0, 'rgba(0,140,230,0.055)');
+      sg.addColorStop(1, 'rgba(0,100,200,0)');
+      ctx.fillStyle = sg;
+      ctx.beginPath();
+      ctx.moveTo(ox, 0); ctx.lineTo(ox + 18, 0);
+      ctx.lineTo(tx + bw, H * 0.65); ctx.lineTo(tx - bw, H * 0.65);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+
+    // Sand
+    const sand = ctx.createLinearGradient(0, H - 28, 0, H);
+    sand.addColorStop(0, 'rgba(55,42,18,0)');
+    sand.addColorStop(1, 'rgba(48,36,14,0.45)');
+    ctx.fillStyle = sand; ctx.fillRect(0, H - 28, W, 28);
+
+    // Surface ripples
+    ctx.save(); ctx.globalAlpha = 0.05;
+    ctx.strokeStyle = '#00D9FF'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 90) {
+      const wx = x + Math.sin(causticT * 0.7 + x * 0.012) * 12;
+      ctx.beginPath(); ctx.moveTo(wx, 0);
+      ctx.quadraticCurveTo(wx + 45, 4 + Math.sin(causticT * 1.1 + x * 0.008) * 3, wx + 90, 0);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+
+  // ── Animation loop ────────────────────────────────────────────────
+
+  let lastT = performance.now();
+  const MAX_P = isMobile() ? 22 : 45;
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min((now - lastT) / 1000, 0.05);
+    lastT = now;
+
+    if (activeScene === 'space') {
+      tickSpaceScene(dt);
+      return;
+    }
+    if (activeScene === 'matrix') {
+      tickMatrixScene(dt);
+      return;
+    }
+
+    // ── Aquarium scene ──
+    drawBg(dt);
+
+    particleT += dt;
+    if (particleT > 0.14 && particles.length < MAX_P) {
+      particleT = 0; particles.push(new TextParticle(false));
+    }
+    for (let i = particles.length - 1; i >= 0; i--) {
+      particles[i].update(dt); particles[i].draw(ctx);
+      if (particles[i].dead) particles.splice(i, 1);
+    }
+
+    for (const sw of seaweeds) { sw.update(dt); sw.draw(ctx); }
+
+    bubbleT += dt;
+    if (bubbleT > rand(0.55, 1.1)) {
+      bubbleT = 0;
+      const bx = rand(0, W);
+      for (let i = 0; i < randInt(1, 3); i++) bubbles.push(new Bubble(bx, H - 30));
+      if (fish.length && Math.random() < 0.45) {
+        const f = fish[randInt(0, fish.length - 1)];
+        bubbles.push(new Bubble(f.x + f.fishW * 0.5, f.y));
+      }
+    }
+    for (let i = bubbles.length - 1; i >= 0; i--) {
+      bubbles[i].update(dt); bubbles[i].draw(ctx);
+      if (bubbles[i].dead) bubbles.splice(i, 1);
+    }
+
+    for (const f of fish) { f.update(dt); f.draw(ctx); }
+  }
+  requestAnimationFrame(frame);
+
+
+  // ── Drag & throw interaction ──────────────────────────────────────
+  //  Click or touch-hold a fish to grab it. Drag it anywhere.
+  //  Release (or flick) to throw — the fish flies off then resumes
+  //  normal swimming. Direction auto-flips to match drag direction.
+
+  let grabbed     = null;  // Fish currently held
+  let dragOffX    = 0, dragOffY = 0;
+  let prevDragX   = 0, prevDragY = 0;
+  let prevDragT   = 0;
+  let velX        = 0, velY = 0;
+
+  // Convert a pointer/touch event to canvas pixel coordinates
+  function canvasXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width  / rect.width;
+    const sy = canvas.height / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - rect.left) * sx,
+             y: (src.clientY - rect.top)  * sy };
+  }
+
+  // Loose hit-test: a padded bounding box around the fish string
+  function hitTest(f, x, y) {
+    const pad = 12;
+    return x >= f.x - pad
+        && x <= f.x + f.fishW + pad
+        && y >= f.y - f.spec.px - pad
+        && y <= f.y + pad * 0.5;
+  }
+
+  function findAt(x, y) {
+    const ents = sceneEntities();
+    for (let i = ents.length - 1; i >= 0; i--)
+      if (hitTest(ents[i], x, y)) return ents[i];
+    return null;
+  }
+
+  function onGrab(e) {
+    const { x, y } = canvasXY(e);
+    const f = findAt(x, y);
+    if (!f) return;
+    grabbed    = f;
+    f.dragging = true;
+    dragOffX   = x - f.x;
+    dragOffY   = y - f.y;
+    prevDragX  = x; prevDragY = y;
+    prevDragT  = performance.now();
+    velX = 0; velY = 0;
+    // Burst effect on grab (aquarium only)
+    if (activeScene === 'aquarium')
+      for (let i = 0; i < 5; i++) bubbles.push(new Bubble(f.x + (f.fishW||0) * 0.5, f.y));
+    canvas.style.cursor = 'grabbing';
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onDrag(e) {
+    const { x, y } = canvasXY(e);
+    if (!grabbed) {
+      canvas.style.cursor = findAt(x, y) ? 'grab' : 'default';
+      return;
+    }
+    const now = performance.now();
+    const dt  = Math.max((now - prevDragT) / 1000, 0.001);
+    // Rolling velocity estimate (pixels / second)
+    velX = (x - prevDragX) / dt;
+    velY = (y - prevDragY) / dt;
+    prevDragX = x; prevDragY = y; prevDragT = now;
+    // Move fish to pointer
+    grabbed.x     = x - dragOffX;
+    grabbed.baseY = y - dragOffY;
+    grabbed.y     = grabbed.baseY;
+    // Flip to face drag direction
+    if (Math.abs(velX) > 20) grabbed.dir = velX > 0 ? 1 : -1;
+    canvas.style.cursor = 'grabbing';
+    if (e.cancelable) e.preventDefault();
+  }
+
+  function onRelease() {
+    if (!grabbed) return;
+    // Transfer drag velocity as throw momentum (capped so fish don't leave orbit)
+    const MAX_THROW = 900;
+    grabbed.throwVx  = Math.max(-MAX_THROW, Math.min(MAX_THROW, velX * 0.38));
+    grabbed.throwVy  = Math.max(-MAX_THROW, Math.min(MAX_THROW, velY * 0.38));
+    // Align swim direction with throw
+    if (Math.abs(grabbed.throwVx) > 20) grabbed.dir = grabbed.throwVx > 0 ? 1 : -1;
+    grabbed.dragging = false;
+    // Release bubble burst
+    for (let i = 0; i < 3; i++) bubbles.push(new Bubble(grabbed.x + grabbed.fishW * 0.5, grabbed.y));
+    grabbed = null;
+    canvas.style.cursor = 'default';
+  }
+
+  // Mouse events
+  canvas.addEventListener('mousedown',  onGrab,   { passive: false });
+  canvas.addEventListener('mousemove',  onDrag,   { passive: false });
+  window.addEventListener('mouseup',    onRelease);
+
+  // Touch events (passive:false so we can preventDefault to stop page scroll)
+  canvas.addEventListener('touchstart', onGrab,   { passive: false });
+  canvas.addEventListener('touchmove',  onDrag,   { passive: false });
+  window.addEventListener('touchend',   onRelease, { passive: false });
+
+
+  // ── Terminal typewriter & nav tabs ───────────────────────────────
+
+  const tlines     = document.getElementById('tlines');
+  const typedEl    = document.getElementById('typed-input');
+  const promptPath = document.getElementById('prompt-path');
+  let autoTimer    = null;
+  let activeTab    = 'auto';
+
+  // ── Static sections (instantly readable, fully selectable) ────────
+
+  const SECTIONS = {
+    about: {
+      path: '~/portfolio',
+      lines: [
+        { text: '$ cat about.txt', cls: 'muted' },
+        { text: 'Kyle Papke — Senior Software Engineer', cls: '' },
+        { text: 'Ann Arbor, MI', cls: 'dim' },
+        { text: '' },
+        { text: 'Specialized in rapid prototyping and building cutting-edge', cls: '' },
+        { text: 'high-fidelity UIs that translate complex data into', cls: '' },
+        { text: 'actionable intelligence — speed, scalability, delivery.', cls: '' },
+        { text: '' },
+        { text: '15+ years across E-commerce · Fintech · AdTech ·', cls: 'dim' },
+        { text: 'Blockchain · Web3 · Cybersecurity', cls: 'dim' },
+      ]
+    },
+    skills: {
+      path: '~/portfolio/skills',
+      lines: [
+        { text: '$ ls -la skills/', cls: 'muted' },
+        { text: 'Languages & Frameworks', cls: 'cyan' },
+        { text: '  TypeScript  React  Golang  Node.js  Next.js  GraphQL  Remix  Vite', cls: 'amber' },
+        { text: 'Infrastructure & Cloud', cls: 'cyan' },
+        { text: '  Docker  Kubernetes  GCP  Supabase  Vercel  GitHub Actions  Jenkins', cls: 'amber' },
+        { text: 'UI/UX & Design', cls: 'cyan' },
+        { text: '  Figma  Tailwind CSS  D3.js  Responsive Design  Accessibility', cls: 'amber' },
+        { text: 'Web3 & Blockchain', cls: 'cyan' },
+        { text: '  Web3  Ethers.js  Wagmi.js  Thirdweb  Smart Contracts  Dapps', cls: 'amber' },
+        { text: 'Testing', cls: 'cyan' },
+        { text: '  Cypress  Playwright  Puppeteer  Vitest', cls: 'amber' },
+        { text: 'AI & Tooling', cls: 'cyan' },
+        { text: '  Claude Code  Cursor  Codex  ChatGPT  MCP', cls: 'amber' },
+      ]
+    },
+    exp: {
+      path: '~/portfolio/experience',
+      lines: [
+        { text: '$ cat experience.log', cls: 'muted' },
+        { text: '► Censys — Senior Software Engineer  (2025 – present)', cls: 'cyan' },
+        { text: '  Ann Arbor, MI  ·  React · TypeScript · Golang · GraphQL · GCP', cls: 'dim' },
+        { text: '  Attack Surface Management platform. AI workflow dashboards.', cls: '' },
+        { text: '' },
+        { text: '► Treasure — Senior Frontend Engineer  (2023 – 2024)', cls: 'cyan' },
+        { text: '  Remote  ·  Web3 · Next.js · TypeScript · Thirdweb · GraphQL', cls: 'dim' },
+        { text: '  Web3 gaming ecosystem, NFT Marketplace, Chain Quests.', cls: '' },
+        { text: '' },
+        { text: '► Criteo — Senior Developer Lead  (2017 – 2023)', cls: 'cyan' },
+        { text: '  Ann Arbor, MI  ·  Led 8 engineers · 2,300+ brands globally', cls: 'dim' },
+        { text: '  Self-service ad platform. Spearheaded GraphQL adoption.', cls: '' },
+        { text: '' },
+        { text: '► TD Ameritrade — Senior Software Developer  (2015 – 2017)', cls: 'cyan' },
+        { text: '  Ann Arbor, MI  ·  React · Agile', cls: 'dim' },
+        { text: '  Robo-advisor & AI chatbot for millennial investors.', cls: '' },
+        { text: '' },
+        { text: '► Thomson Reuters — Frontend Developer  (2014 – 2015)', cls: 'cyan' },
+        { text: '  Dexter, MI  ·  D3.js dashboards for tax & accounting.', cls: 'dim' },
+        { text: '' },
+        { text: '► Coach — Web Developer  (2011 – 2012)', cls: 'cyan' },
+        { text: '  New York, NY  ·  JS SPAs for US / China / Japan e-commerce.', cls: 'dim' },
+      ]
+    },
+    projects: {
+      path: '~/portfolio/projects',
+      lines: [
+        { text: '$ cat initiatives.md', cls: 'muted' },
+        { text: '★ Project Saturn  (America Guild)', cls: 'orange' },
+        { text: '  Automated research, scanning, investment analysis &', cls: '' },
+        { text: '  trade execution for Polymarket prediction markets.', cls: '' },
+        { text: '' },
+        { text: '★ AI Trading Camera  (Android)', cls: 'orange' },
+        { text: '  AI-powered camera that analyzes memecoin charts,', cls: '' },
+        { text: '  providing take-profit and stop-loss targets.', cls: '' },
+        { text: '' },
+        { text: '★ Dynamic Wealth Solutions', cls: 'orange' },
+        { text: '  Custom automated fintech solution for client strategy.', cls: '' },
+        { text: '' },
+        { text: '★ Consortium Key Trading Tools', cls: 'orange' },
+        { text: '  Interactive dashboard for Web3 portfolio management', cls: '' },
+        { text: '  and high-stakes trading utilities.', cls: '' },
+      ]
+    },
+    contact: {
+      path: '~/portfolio/contact',
+      lines: [
+        { text: '$ cat contact.txt', cls: 'muted' },
+        { text: 'name    Kyle Papke', cls: '' },
+        { text: 'title   Senior Software Engineer', cls: '' },
+        { text: 'loc     Ann Arbor, MI', cls: 'dim' },
+        { text: '' },
+        { text: 'email   kpapke@gmail.com', cls: 'cyan', href: 'mailto:kpapke@gmail.com' },
+        { text: 'web     kylepapke.xyz', cls: 'cyan', href: 'https://kylepapke.xyz' },
+        { text: 'in      linkedin.com/in/kylepapke/', cls: 'cyan', href: 'https://linkedin.com/in/kylepapke/' },
+      ]
+    },
+  };
+
+  // ── Auto typewriter (slower — actually readable) ───────────────────
+
+  const SCRIPT = [
+    { t: 'prompt', text: 'whoami',                                          pause: 2200 },
+    { t: 'out',    text: 'Kyle Papke  ·  Senior Software Engineer',         cls: '',      pause: 1000 },
+    { t: 'out',    text: '15+ years  ·  Fintech · Web3 · AdTech · Cyber',  cls: 'dim',   pause: 3000 },
+    { t: 'prompt', text: 'ls skills/',                                       pause: 2000 },
+    { t: 'out',    text: 'TypeScript  React  Golang  GraphQL  Next.js',     cls: 'amber', pause: 900 },
+    { t: 'out',    text: 'Docker  GCP  Web3  D3.js  Tailwind  Claude Code', cls: 'amber', pause: 3000 },
+    { t: 'prompt', text: 'cat experience.log | head -6',                     pause: 2000 },
+    { t: 'out',    text: '► Censys        Sr Software Engineer  2025–now', cls: 'cyan',  pause: 900 },
+    { t: 'out',    text: '► Treasure      Sr Frontend Eng       2023–2024',cls: 'cyan',  pause: 900 },
+    { t: 'out',    text: '► Criteo        Sr Developer Lead     2017–2023',cls: 'cyan',  pause: 900 },
+    { t: 'out',    text: '► TD Ameritrade Sr Software Dev       2015–2017',cls: 'cyan',  pause: 3000 },
+    { t: 'prompt', text: 'cat contact.txt',                                  pause: 2000 },
+    { t: 'out',    text: 'email  →  kpapke@gmail.com',                      cls: 'cyan',  pause: 800 },
+    { t: 'out',    text: 'web    →  kylepapke.xyz',                         cls: 'cyan',  pause: 800 },
+    { t: 'out',    text: 'in     →  linkedin.com/in/kylepapke/',             cls: 'cyan',  pause: 3500 },
+    { t: 'prompt', text: 'open portfolio --watch --loop',                    pause: 2200 },
+  ];
+
+  let shown = [], scriptIdx = 0;
+
+  function clearLines() { tlines.innerHTML = ''; shown = []; }
+
+  function addLine(text, cls, href) {
+    const el = document.createElement('div');
+    el.className = `t-line ${cls || ''}`;
+    if (href) {
+      const a = document.createElement('a');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = text; el.appendChild(a);
+    } else {
+      el.textContent = text;
+    }
+    tlines.appendChild(el);
+    shown.push(el);
+    tlines.scrollTop = tlines.scrollHeight;
+  }
+
+  function showSection(key) {
+    stopAuto(); clearLines();
+    const sec = SECTIONS[key];
+    promptPath.textContent = sec.path;
+    typedEl.textContent = '';
+    sec.lines.forEach(l => addLine(l.text, l.cls, l.href));
+  }
+
+  function stopAuto() { clearTimeout(autoTimer); autoTimer = null; }
+
+  function runAuto() {
+    if (activeTab !== 'auto') return;
+    if (scriptIdx >= SCRIPT.length) { scriptIdx = 0; clearLines(); }
+    const item = SCRIPT[scriptIdx];
+    promptPath.textContent = '~/portfolio';
+    if (item.t === 'prompt') {
+      typedEl.textContent = '';
+      let i = 0;
+      (function typeChar() {
+        if (activeTab !== 'auto') return;
+        if (i < item.text.length) {
+          typedEl.textContent = item.text.slice(0, ++i);
+          autoTimer = setTimeout(typeChar, 42 + Math.random() * 36);
+        } else {
+          autoTimer = setTimeout(() => {
+            addLine('$ ' + item.text, 'muted');
+            typedEl.textContent = '';
+            scriptIdx++;
+            autoTimer = setTimeout(runAuto, item.pause);
+          }, 200);
+        }
+      })();
+    } else {
+      addLine(item.text, item.cls);
+      scriptIdx++;
+      autoTimer = setTimeout(runAuto, item.pause);
+    }
+  }
+
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      activeTab = btn.dataset.tab;
+      if (activeTab === 'auto') { clearLines(); scriptIdx = 0; runAuto(); }
+      else showSection(activeTab);
+    });
+  });
+
+  autoTimer = setTimeout(runAuto, 1200);
+
+
+  // ── Scene system ─────────────────────────────────────────────────
+  //  Scenes: 'aquarium' (default), 'space', 'matrix'
+  //  Each scene has its own entity classes and background draw fn.
+  //  The frame loop calls the active scene's drawBg + entity updates.
+
+  let activeScene = 'aquarium';
+
+  // ── Space scene ───────────────────────────────────────────────────
+
+  const ROCKET_DEFS = [
+    { s: '^{|}',     px: 14, c: '#00FF87', g: 'rgba(0,255,135,0.4)',  spd: 40, n: isMobile()?2:3 },
+    { s: '^>',       px: 11, c: '#7DF9FF', g: 'rgba(125,249,255,0.3)',spd: 65, n: isMobile()?2:4 },
+    { s: '***^***',  px: 12, c: '#FFB700', g: 'rgba(255,183,0,0.4)',  spd: 30, n: isMobile()?1:2 },
+    { s: '=>>',      px: 13, c: '#FF6B35', g: 'rgba(255,107,53,0.4)', spd: 80, n: isMobile()?1:2 },
+    { s: '<*>^<*>',  px: 10, c: '#B8FFDA', g: 'rgba(184,255,218,0.2)',spd: 55, n: isMobile()?1:2 },
+  ];
+
+  class Rocket {
+    constructor(def, x, y) {
+      this.spec  = def;
+      this.x     = x; this.y = y; this.baseX = x;
+      this.dir   = Math.random() < 0.5 ? 1 : -1; // vertical: 1=up, -1=down... but let's go horizontal too
+      this.vdir  = Math.random() < 0.7 ? -1 : 1;  // vertical drift
+      this.speed = def.spd * rand(0.7, 1.3);
+      this.phase = rand(0, Math.PI * 2);
+      this.freq  = rand(0.2, 0.5);
+      this.amp   = rand(10, 30);
+      this.cellW = measureCell(def.px);
+      this.fishW = def.s.length * this.cellW;
+      this.dragging = false; this.throwVx = 0; this.throwVy = 0;
+    }
+    get chars() { return this.dir < 0 ? flip(this.spec.s) : this.spec.s; }
+    get fishW2() { return this.spec.s.length * this.cellW; }
+    update(dt) {
+      if (this.dragging) { this.phase += dt * this.freq * 5; return; }
+      if (Math.abs(this.throwVx) > 1 || Math.abs(this.throwVy) > 1) {
+        this.x += this.throwVx * dt; this.y += this.throwVy * dt;
+        this.y  = Math.max(10, Math.min(H - 10, this.y));
+        const d = Math.pow(0.5, dt / 0.28);
+        this.throwVx *= d; this.throwVy *= d;
+      } else {
+        this.throwVx = 0; this.throwVy = 0;
+      }
+      this.phase += dt * this.freq;
+      this.x     += this.speed * this.dir * dt;
+      this.y      = this.baseX + Math.sin(this.phase) * this.amp; // baseX reused as baseY for space
+      const pad = this.fishW2 + 30;
+      if (this.dir > 0 && this.x >  W + pad) { this.x = -pad;   this.baseX = rand(30, H - 190); }
+      if (this.dir < 0 && this.x < -pad)      { this.x = W + pad; this.baseX = rand(30, H - 190); }
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.font        = `${this.spec.px}px "JetBrains Mono", monospace`;
+      ctx.fillStyle   = this.dragging ? '#FFFFFF' : this.spec.c;
+      ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g;
+      ctx.shadowBlur  = this.dragging ? 24 : 15;
+      const chars = this.chars, len = chars.length;
+      const wigAmp  = this.dragging ? 5 : 1.5;
+      const wigFreq = this.dragging ? 4.5 : 2;
+      for (let i = 0; i < len; i++) {
+        const lag = (this.dir > 0 ? i : len - 1 - i) * 0.2;
+        const cy  = this.y + Math.sin(this.phase * wigFreq + lag) * wigAmp;
+        ctx.fillText(chars[i], this.x + i * this.cellW, cy);
+      }
+      ctx.restore();
+    }
+  }
+
+  class Star {
+    constructor(init) {
+      this.reset(init);
+    }
+    reset(init) {
+      this.x = rand(0, W); this.y = init ? rand(0, H) : rand(0, H);
+      this.ch = ['.','·','*','✦','✧','⊹'][randInt(0,5)];
+      this.a  = rand(0.1, 0.7); this.sz = rand(7, 12);
+      this.twinklePhase = rand(0, Math.PI*2);
+      this.twinkleFreq  = rand(0.3, 1.5);
+      this.col = ['#FFFFFF','#B8E0FF','#FFE4B5','#C8FFC8'][randInt(0,3)];
+    }
+    update(dt) { this.twinklePhase += dt * this.twinkleFreq; }
+    draw(ctx) {
+      ctx.save();
+      ctx.globalAlpha = this.a * (0.5 + 0.5 * Math.sin(this.twinklePhase));
+      ctx.font = `${this.sz}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = this.col; ctx.shadowColor = this.col; ctx.shadowBlur = 4;
+      ctx.fillText(this.ch, this.x, this.y);
+      ctx.restore();
+    }
+  }
+
+  class RocketTrail {
+    constructor(x, y, dir) {
+      this.x = x; this.y = y;
+      this.ch = ['·','°','*','.'][randInt(0,3)];
+      this.vx = -dir * rand(20, 50); this.vy = rand(-15, 15);
+      this.a  = rand(0.4, 0.8); this.sz = rand(7, 11);
+      this.life = rand(0.4, 1.0); this.maxLife = this.life;
+    }
+    update(dt) { this.x += this.vx*dt; this.y += this.vy*dt; this.life -= dt; }
+    draw(ctx) {
+      const alpha = (this.life / this.maxLife) * this.a;
+      ctx.save(); ctx.globalAlpha = alpha;
+      ctx.font = `${this.sz}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = '#FFB700'; ctx.shadowColor = '#FF6B35'; ctx.shadowBlur = 5;
+      ctx.fillText(this.ch, this.x, this.y);
+      ctx.restore();
+    }
+    get dead() { return this.life <= 0; }
+  }
+
+  let rockets = [], stars = [], rocketTrails = [], rocketTrailT = 0;
+
+  function buildSpaceScene() {
+    rockets = []; stars = []; rocketTrails = [];
+    for (const def of ROCKET_DEFS)
+      for (let i = 0; i < def.n; i++) {
+        const r = new Rocket(def, rand(0, W), rand(30, H - 190));
+        r.baseX = r.y;
+        rockets.push(r);
+      }
+    const starCount = isMobile() ? 60 : 120;
+    for (let i = 0; i < starCount; i++) stars.push(new Star(true));
+  }
+
+  function drawSpaceBg(dt) {
+    // Deep space gradient
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#000308'); g.addColorStop(0.5, '#020008'); g.addColorStop(1, '#04000A');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // Nebula wisps
+    ctx.save();
+    const n1 = ctx.createRadialGradient(W*0.3, H*0.35, 0, W*0.3, H*0.35, W*0.4);
+    n1.addColorStop(0, 'rgba(40,0,80,0.18)'); n1.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = n1; ctx.fillRect(0, 0, W, H);
+    const n2 = ctx.createRadialGradient(W*0.75, H*0.6, 0, W*0.75, H*0.6, W*0.35);
+    n2.addColorStop(0, 'rgba(0,40,80,0.15)'); n2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = n2; ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  function tickSpaceScene(dt) {
+    drawSpaceBg(dt);
+    for (const s of stars) { s.update(dt); s.draw(ctx); }
+    rocketTrailT += dt;
+    if (rocketTrailT > 0.04) {
+      rocketTrailT = 0;
+      for (const r of rockets) {
+        if (!r.dragging && Math.random() < 0.6)
+          rocketTrails.push(new RocketTrail(r.x, r.y, r.dir));
+      }
+    }
+    for (let i = rocketTrails.length-1; i>=0; i--) {
+      rocketTrails[i].update(dt); rocketTrails[i].draw(ctx);
+      if (rocketTrails[i].dead) rocketTrails.splice(i, 1);
+    }
+    for (const r of rockets) { r.update(dt); r.draw(ctx); }
+  }
+
+  // ── Matrix scene ──────────────────────────────────────────────────
+
+  const MATRIX_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01><{}[]ABCDEF'.split('');
+
+  class MatrixColumn {
+    constructor(x) {
+      this.x    = x;
+      this.y    = rand(-H, 0);
+      this.speed = rand(80, 200);
+      this.len  = randInt(8, 22);
+      this.chars = Array.from({length: this.len}, () =>
+        MATRIX_CHARS[randInt(0, MATRIX_CHARS.length-1)]);
+      this.mutateT = 0;
+      this.cellH  = 16;
+      this.dragging = false; this.throwVx = 0; this.throwVy = 0;
+      // for hit testing treat as a vertical fish
+      this.fishW = 12; this.spec = { px: 13 };
+    }
+    update(dt) {
+      if (this.dragging) return;
+      if (Math.abs(this.throwVy) > 1) {
+        this.y += this.throwVy * dt;
+        this.throwVy *= Math.pow(0.5, dt / 0.28);
+      } else {
+        this.throwVy = 0;
+        this.y += this.speed * dt;
+      }
+      if (this.y > H + this.len * this.cellH) {
+        this.y = rand(-H * 0.5, -50);
+        this.x = rand(0, W);
+        this.speed = rand(80, 200);
+      }
+      this.mutateT += dt;
+      if (this.mutateT > 0.12) {
+        this.mutateT = 0;
+        const idx = randInt(0, this.len - 1);
+        this.chars[idx] = MATRIX_CHARS[randInt(0, MATRIX_CHARS.length-1)];
+      }
+    }
+    draw(ctx) {
+      ctx.save();
+      ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`;
+      for (let i = 0; i < this.len; i++) {
+        const cy = this.y + i * this.cellH;
+        if (cy < -this.cellH || cy > H + this.cellH) continue;
+        const isHead = (i === this.len - 1);
+        if (isHead) {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = '#00FF87';
+          ctx.shadowBlur = 12;
+        } else {
+          const fade = i / this.len;
+          ctx.fillStyle = `rgba(0,${Math.floor(180 + 75 * fade)},${Math.floor(80 * fade)},${0.2 + 0.8 * fade})`;
+          ctx.shadowBlur = 0;
+        }
+        ctx.fillText(this.chars[i], this.x, cy);
+      }
+      ctx.restore();
+    }
+  }
+
+  let matrixCols = [];
+
+  function buildMatrixScene() {
+    matrixCols = [];
+    const cols = Math.floor(W / 18);
+    for (let i = 0; i < cols; i++)
+      matrixCols.push(new MatrixColumn(i * 18 + rand(0, 8)));
+  }
+
+  function drawMatrixBg() {
+    ctx.fillStyle = 'rgba(0,4,0,0.18)'; ctx.fillRect(0, 0, W, H);
+  }
+
+  function tickMatrixScene(dt) {
+    drawMatrixBg(dt);
+    for (const c of matrixCols) { c.update(dt); c.draw(ctx); }
+  }
+
+  // ── Scene entities for hit-testing ────────────────────────────────
+
+  function sceneEntities() {
+    if (activeScene === 'aquarium') return fish;
+    if (activeScene === 'space')    return rockets;
+    if (activeScene === 'matrix')   return matrixCols;
+    return [];
+  }
+
+  // ── Wire scene switcher buttons ───────────────────────────────────
+
+  function switchScene(name) {
+    activeScene = name;
+    if (name === 'aquarium') { buildScene(); }
+    if (name === 'space')    { buildSpaceScene(); }
+    if (name === 'matrix')   { buildMatrixScene(); }
+  }
+
+  document.querySelectorAll('.scene-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      switchScene(btn.dataset.scene);
+    });
+  });
+
+  // Build initial scenes
+  buildSpaceScene();
+  buildMatrixScene();
+
+  // ── Clock ─────────────────────────────────────────────────────────
+
+  function tick() {
+    const n = new Date();
+    const el = document.getElementById('mb-clock');
+    if (el) el.textContent =
+      String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 15000);
+
+  </script>
+</body>
+</html>
