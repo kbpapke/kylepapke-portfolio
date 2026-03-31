@@ -780,10 +780,10 @@ const styles = {
     fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
     letterSpacing: '0.02em', whiteSpace: 'nowrap' as const,
   },
-  // floating pill inside the canvas body, top-right corner — no collision with title text
+  // floating pill inside the canvas body, top-right corner — vertical list, no collision
   sceneBtns: {
     position: 'absolute' as const, top: 10, right: 12, zIndex: 30,
-    display: 'flex' as const, gap: 4,
+    display: 'flex' as const, flexDirection: 'column' as const, gap: 2, alignItems: 'flex-end' as const,
     background: 'rgba(10,12,16,0.7)',
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
@@ -794,8 +794,8 @@ const styles = {
     background: 'transparent', border: 'none',
     color: 'rgba(255,255,255,0.45)', fontFamily: FONT,
     fontSize: 9.5, padding: '2px 7px', borderRadius: 4, cursor: 'pointer' as const,
-    letterSpacing: '0.03em', textDecoration: 'none',
-    transition: 'color 0.12s, background 0.12s',
+    letterSpacing: '0.03em', textDecoration: 'none', textAlign: 'right' as const,
+    transition: 'color 0.12s, background 0.12s', width: '100%',
   },
   sceneBtnActive: {
     background: 'rgba(0,255,135,0.12)', color: GREEN,
@@ -842,7 +842,7 @@ const styles = {
 
   // Draw pill — always-visible input at top of canvas, left side
   drawPill: {
-    position: 'absolute' as const, top: 10, left: 12, right: 200, zIndex: 30,
+    position: 'absolute' as const, top: 10, left: 12, width: 160, zIndex: 30,
     display: 'flex' as const, alignItems: 'center' as const, gap: 6,
     background: 'rgba(10,12,16,0.7)',
     backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
