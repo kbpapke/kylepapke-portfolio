@@ -1,14 +1,14 @@
-import { rand, randInt, flip, measureCell, DraggableEntity, SceneDriver } from '../sceneUtils'
+import { rand, randInt, flip, measureCell, CANVAS_FONT, DraggableEntity, SceneDriver } from '../sceneUtils'
 
 const SPECIES_BASE = [
-  { s: '><{{{°>',  px: 14, c: '#00FF87', g: 'rgba(0,255,135,0.35)',  spd: 55,  amp: 18, n: [2, 3] },
-  { s: '><°>',     px: 12, c: '#00FF87', g: 'rgba(0,255,135,0.25)',  spd: 82,  amp: 11, n: [3, 4] },
-  { s: '=><{{°>>', px: 16, c: '#FFB700', g: 'rgba(255,183,0,0.30)',  spd: 36,  amp: 23, n: [1, 2] },
-  { s: '><(((*>',  px: 13, c: '#00D9FF', g: 'rgba(0,217,255,0.30)',  spd: 67,  amp: 14, n: [2, 3] },
-  { s: '>~>',      px: 10, c: '#B8FFDA', g: 'rgba(184,255,218,0.2)', spd: 98,  amp:  8, n: [3, 5] },
-  { s: '><{  °>',  px: 18, c: '#FF6B35', g: 'rgba(255,107,53,0.32)', spd: 27,  amp: 26, n: [1, 1] },
-  { s: '><((()>',  px: 13, c: '#FF8C42', g: 'rgba(255,140,66,0.28)', spd: 60,  amp: 15, n: [1, 2] },
-  { s: '~><{°>',   px: 11, c: '#7DF9FF', g: 'rgba(125,249,255,0.2)', spd: 74,  amp: 12, n: [1, 2] },
+  // Icon-forward aquarium sprites (emoji-capable font stack via CANVAS_FONT).
+  // Avoid variation selectors where possible; keep each sprite as a single glyph.
+  { s: '🐟', px: 18, c: '#00FF87', g: 'rgba(0,255,135,0.35)',  spd: 55, amp: 18, n: [2, 3] },
+  { s: '🐠', px: 18, c: '#00D9FF', g: 'rgba(0,217,255,0.30)',  spd: 67, amp: 14, n: [2, 3] },
+  { s: '🐡', px: 18, c: '#FFB700', g: 'rgba(255,183,0,0.30)',  spd: 36, amp: 23, n: [1, 2] },
+  { s: '🦈', px: 20, c: '#B8FFDA', g: 'rgba(184,255,218,0.22)', spd: 48, amp: 16, n: [1, 1] },
+  { s: '🐙', px: 18, c: '#FF6B35', g: 'rgba(255,107,53,0.32)', spd: 27, amp: 26, n: [1, 1] },
+  { s: '🪼', px: 18, c: '#7DF9FF', g: 'rgba(125,249,255,0.25)', spd: 42, amp: 22, n: [1, 2] },
 ]
 
 const BUBBLES = ['○', '◦', '°', '·', '˚']
@@ -30,7 +30,10 @@ class Fish implements DraggableEntity {
     this.freq = rand(0.38, 0.70)
     this.amp = spec.amp * rand(0.7, 1.3)
     this.cellW = measureCell(ctx, spec.px)
-    this.fishW = spec.s.length * this.cellW
+    ctx.save()
+    ctx.font = `${spec.px}px ${CANVAS_FONT}`
+    this.fishW = ctx.measureText(spec.s).width
+    ctx.restore()
   }
 
   get chars() { return this.dir < 0 ? flip(this.spec.s) : this.spec.s }
@@ -54,7 +57,7 @@ class Fish implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`
+    ctx.font = `${this.spec.px}px ${CANVAS_FONT}`
     ctx.fillStyle = this.dragging ? '#FFFFFF' : this.spec.c
     ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g
     ctx.shadowBlur = this.dragging ? 24 : 13

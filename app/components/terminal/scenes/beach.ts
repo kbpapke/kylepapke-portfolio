@@ -1,12 +1,14 @@
-import { rand, randInt, flip, measureCell, DraggableEntity, SceneDriver } from '../sceneUtils'
+import { rand, randInt, flip, measureCell, CANVAS_FONT, DraggableEntity, SceneDriver } from '../sceneUtils'
 
 // ── Beach entities ────────────────────────────────────────────────────────────
 
 // Floaty objects on the water surface or drifting in the sky
 const FLOAT_SPECS = [
-  { s: '⛱️',  px: 20, c: '#FF6B35', g: 'rgba(255,107,53,0.4)',  spd: 22, amp: 6,  n: [1, 2] },
+  // Emoji are fine as long as canvas has emoji font fallbacks.
+  // Also avoid variation selectors (e.g. ⛱️ / 🕶️) which can render blank on some stacks.
+  { s: '⛱',  px: 20, c: '#FF6B35', g: 'rgba(255,107,53,0.4)',  spd: 22, amp: 6,  n: [1, 2] },
   { s: '🏐',  px: 18, c: '#FF4081', g: 'rgba(255,64,129,0.4)',   spd: 35, amp: 8,  n: [2, 3] },
-  { s: '🕶️',  px: 16, c: '#FFB700', g: 'rgba(255,183,0,0.35)',  spd: 28, amp: 5,  n: [1, 2] },
+  { s: '🕶',  px: 16, c: '#FFB700', g: 'rgba(255,183,0,0.35)',  spd: 28, amp: 5,  n: [1, 2] },
   { s: '🍋',  px: 16, c: '#FFE44D', g: 'rgba(255,228,77,0.35)', spd: 20, amp: 7,  n: [1, 2] },
   { s: '🍉',  px: 18, c: '#4CAF50', g: 'rgba(76,175,80,0.35)',  spd: 18, amp: 6,  n: [1, 2] },
 ]
@@ -57,7 +59,7 @@ class BeachEntity implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`
+    ctx.font = `${this.spec.px}px ${CANVAS_FONT}`
     ctx.fillStyle = this.dragging ? '#FFFFFF' : this.spec.c
     ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g
     ctx.shadowBlur = this.dragging ? 24 : 14
@@ -88,7 +90,7 @@ class WaveRow {
   draw(ctx: CanvasRenderingContext2D, W: number) {
     ctx.save()
     ctx.globalAlpha = this.alpha
-    ctx.font = '13px "JetBrains Mono", monospace'
+    ctx.font = `13px ${CANVAS_FONT}`
     ctx.fillStyle = this.color
     ctx.shadowColor = this.color; ctx.shadowBlur = 4
     const cellW = W / this.chars.length
@@ -116,7 +118,7 @@ class SandGrain {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save(); ctx.globalAlpha = this.a
-    ctx.font = `${this.sz}px "JetBrains Mono", monospace`
+    ctx.font = `${this.sz}px ${CANVAS_FONT}`
     ctx.fillStyle = this.col
     ctx.fillText(this.ch, this.x, this.y)
     ctx.restore()
@@ -146,10 +148,10 @@ class Seagull {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.sz}px "JetBrains Mono", monospace`
+    ctx.font = `${this.sz}px ${CANVAS_FONT}`
     ctx.fillStyle = '#E8E8E8'; ctx.shadowColor = 'rgba(255,255,255,0.4)'; ctx.shadowBlur = 5
     // ascii gull: m or w shape depending on direction
-    const glyph = this.dir > 0 ? 'ᵛ' : 'ᵛ'
+    const glyph = 'ᵛ'
     ctx.fillText(glyph, this.x, this.y)
     ctx.restore()
   }
@@ -223,9 +225,9 @@ export function buildBeachScene(
     sunR.addColorStop(1, 'rgba(255,120,0,0)')
     ctx.fillStyle = sunR; ctx.fillRect(0, 0, W, waterY)
 
-    // Sun disc (ASCII ☀ with glow)
+    // Sun disc with glow
     ctx.save()
-    ctx.font = `${mobile ? 18 : 26}px "JetBrains Mono", monospace`
+    ctx.font = `${mobile ? 18 : 26}px ${CANVAS_FONT}`
     ctx.fillStyle = '#FFE44D'
     ctx.shadowColor = 'rgba(255,220,80,0.8)'; ctx.shadowBlur = 28
     ctx.fillText('☀', sunX - 10, sunY + 8)

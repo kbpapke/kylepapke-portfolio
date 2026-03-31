@@ -1,6 +1,10 @@
 export const rand = (a: number, b: number) => a + Math.random() * (b - a)
 export const randInt = (a: number, b: number) => Math.floor(rand(a, b + 1))
 
+// Canvas font stack: JetBrains for ASCII + emoji fallbacks for cross-platform sprites.
+export const CANVAS_FONT =
+  '"JetBrains Mono","Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",monospace'
+
 const MIRROR: Record<string, string> = {
   '>': '<', '<': '>', '{': '}', '}': '{',
   '(': ')', ')': '(', '[': ']', ']': '[',
@@ -11,7 +15,7 @@ export const flip = (s: string) =>
 export function measureCell(
   ctx: CanvasRenderingContext2D,
   size: number,
-  font = '"JetBrains Mono", monospace',
+  font = CANVAS_FONT,
 ): number {
   ctx.font = `${size}px ${font}`
   return ctx.measureText('M').width

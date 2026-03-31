@@ -1,4 +1,4 @@
-import { rand, randInt, DraggableEntity, SceneDriver } from '../sceneUtils'
+import { rand, randInt, CANVAS_FONT, DraggableEntity, SceneDriver } from '../sceneUtils'
 
 const MATRIX_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01><{}[]ABCDEF'.split('')
 
@@ -41,7 +41,7 @@ class MatrixColumn implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D, H: number) {
     ctx.save()
-    ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`
+    ctx.font = `${this.spec.px}px ${CANVAS_FONT}`
     for (let i = 0; i < this.len; i++) {
       const cy = this.y + i * this.cellH
       if (cy < -this.cellH || cy > H + this.cellH) continue

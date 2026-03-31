@@ -6,7 +6,7 @@ import { buildMatrixScene } from './scenes/matrix'
 import { buildBeachScene } from './scenes/beach'
 import { buildSkyScene } from './scenes/sky'
 import { useAmbientAudio, SceneName } from './useAmbientAudio'
-import { rand } from './sceneUtils'
+import { rand, CANVAS_FONT } from './sceneUtils'
 import type { SceneDriver, DraggableEntity } from './sceneUtils'
 
 // ── Resume content ────────────────────────────────────────────────────────────
@@ -223,7 +223,7 @@ class WordEntity implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.fontSize}px "JetBrains Mono", monospace`
+    ctx.font = `${this.fontSize}px ${CANVAS_FONT}`
     ctx.fillStyle   = this.dragging ? '#FFFFFF' : this.color
     ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.glowColor
     ctx.shadowBlur  = this.dragging ? 22 : 12
@@ -462,7 +462,7 @@ export function TerminalScene({ scene }: Props) {
     const canvas  = canvasRef.current as HTMLCanvasElement
     const ctx2d   = canvas.getContext('2d')!
     const fontSize = 14
-    const fontStr  = `${fontSize}px "JetBrains Mono", monospace`
+    const fontStr  = `${fontSize}px ${CANVAS_FONT}`
 
     // Use pretext for accurate Unicode/emoji-aware width measurement
     let measuredWidth: number
@@ -545,7 +545,7 @@ export function TerminalScene({ scene }: Props) {
       const l = line as { text: string; cls: string; href?: string; wrap?: boolean }
       if (l.wrap && l.text && pretextRef.current) {
         const { prepareWithSegments, layoutWithLines } = pretextRef.current
-        const prepared = prepareWithSegments(l.text, '12px "JetBrains Mono", monospace')
+        const prepared = prepareWithSegments(l.text, `12px ${CANVAS_FONT}`)
         const { lines: wrapped } = layoutWithLines(prepared, termWidth, 18)
         for (const wl of wrapped) expanded.push({ text: wl.text, cls: l.cls })
       } else {
@@ -584,8 +584,8 @@ export function TerminalScene({ scene }: Props) {
     aquarium: { emoji: '🐟', label: 'ocean',  route: '/aquarium' },
     space:    { emoji: '🚀', label: 'space',  route: '/space'    },
     matrix:   { emoji: '⬛', label: 'matrix', route: '/matrix'   },
-    beach:    { emoji: '🏖️', label: 'beach',  route: '/beach'   },
-    sky:      { emoji: '☁️', label: 'sky',    route: '/sky'     },
+    beach:    { emoji: '🏖', label: 'beach',  route: '/beach'   },
+    sky:      { emoji: '☁', label: 'sky',    route: '/sky'     },
   }
 
   // ── Render ────────────────────────────────────────────────────────────────

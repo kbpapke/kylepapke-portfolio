@@ -1,15 +1,17 @@
-import { rand, randInt, flip, measureCell, DraggableEntity, SceneDriver } from '../sceneUtils'
+import { rand, randInt, flip, measureCell, CANVAS_FONT, DraggableEntity, SceneDriver } from '../sceneUtils'
 
 // ── Sky entities ──────────────────────────────────────────────────────────────
 
 const AIR_SPECS = [
-  { s: '✈️', px: 18, c: '#7DF9FF', g: 'rgba(125,249,255,0.35)', spd: 70, amp: 10, n: [1, 2] },
+  // Emoji are fine as long as canvas has emoji font fallbacks.
+  // Also avoid variation selectors (e.g. ✈️) which can render blank on some stacks.
+  { s: '✈', px: 18, c: '#7DF9FF', g: 'rgba(125,249,255,0.35)', spd: 70, amp: 10, n: [1, 2] },
   { s: '🚁', px: 18, c: '#00FF87', g: 'rgba(0,255,135,0.30)', spd: 48, amp: 14, n: [1, 2] },
-  { s: '🛩️', px: 16, c: '#FFB700', g: 'rgba(255,183,0,0.30)', spd: 62, amp: 9, n: [1, 2] },
+  { s: '🛩', px: 16, c: '#FFB700', g: 'rgba(255,183,0,0.30)', spd: 62, amp: 9, n: [1, 2] },
   { s: '🛫', px: 16, c: '#FF6B35', g: 'rgba(255,107,53,0.30)', spd: 80, amp: 8, n: [1, 1] },
 ]
 
-const CLOUD_CHARS = ['☁', '☁︎', '⛅', '˙', '·']
+const CLOUD_CHARS = ['☁', '☁', '⛅', '˙', '·']
 const CONTRAIL_CHARS = ['·', '°', '˙', '—']
 
 interface Spec { s: string; px: number; c: string; g: string; spd: number; amp: number }
@@ -29,7 +31,10 @@ class Aircraft implements DraggableEntity {
     this.freq = rand(0.18, 0.42)
     this.amp = spec.amp * rand(0.7, 1.25)
     this.cellW = measureCell(ctx, spec.px)
-    this.fishW = spec.s.length * this.cellW
+    ctx.save()
+    ctx.font = `${spec.px}px ${CANVAS_FONT}`
+    this.fishW = ctx.measureText(spec.s).width
+    ctx.restore()
   }
 
   get chars() { return this.dir < 0 ? flip(this.spec.s) : this.spec.s }
@@ -55,7 +60,7 @@ class Aircraft implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`
+    ctx.font = `${this.spec.px}px ${CANVAS_FONT}`
     ctx.fillStyle = this.dragging ? '#FFFFFF' : this.spec.c
     ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g
     ctx.shadowBlur = this.dragging ? 24 : 14
@@ -97,7 +102,7 @@ class Cloud {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.globalAlpha = this.a
-    ctx.font = `${this.sz}px "JetBrains Mono", monospace`
+    ctx.font = `${this.sz}px ${CANVAS_FONT}`
     ctx.fillStyle = '#CFE9FF'
     ctx.shadowColor = 'rgba(125,249,255,0.35)'
     ctx.shadowBlur = 10
@@ -130,7 +135,7 @@ class Contrail {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.globalAlpha = (this.life / this.maxLife) * this.a
-    ctx.font = `${this.sz}px "JetBrains Mono", monospace`
+    ctx.font = `${this.sz}px ${CANVAS_FONT}`
     ctx.fillStyle = '#FFFFFF'
     ctx.shadowColor = 'rgba(125,249,255,0.35)'
     ctx.shadowBlur = 8

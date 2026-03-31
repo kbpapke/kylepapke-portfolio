@@ -1,11 +1,12 @@
-import { rand, randInt, flip, measureCell, DraggableEntity, SceneDriver } from '../sceneUtils'
+import { rand, randInt, flip, measureCell, CANVAS_FONT, DraggableEntity, SceneDriver } from '../sceneUtils'
 
 const ROCKET_DEFS = [
-  { s: '^{|}',    px: 14, c: '#00FF87', g: 'rgba(0,255,135,0.4)',   spd: 40, n: [2, 3] },
-  { s: '^>',      px: 11, c: '#7DF9FF', g: 'rgba(125,249,255,0.3)', spd: 65, n: [2, 4] },
-  { s: '***^***', px: 12, c: '#FFB700', g: 'rgba(255,183,0,0.4)',   spd: 30, n: [1, 2] },
-  { s: '=>>',     px: 13, c: '#FF6B35', g: 'rgba(255,107,53,0.4)',  spd: 80, n: [1, 2] },
-  { s: '<*>^<*>', px: 10, c: '#B8FFDA', g: 'rgba(184,255,218,0.2)', spd: 55, n: [1, 2] },
+  // Icon-forward space sprites.
+  { s: '🚀', px: 18, c: '#00FF87', g: 'rgba(0,255,135,0.4)',   spd: 55, n: [2, 3] },
+  { s: '🛰', px: 17, c: '#7DF9FF', g: 'rgba(125,249,255,0.3)', spd: 40, n: [1, 2] },
+  { s: '🛸', px: 18, c: '#FFB700', g: 'rgba(255,183,0,0.4)',   spd: 30, n: [1, 2] },
+  { s: '☄', px: 18, c: '#FF6B35', g: 'rgba(255,107,53,0.4)',  spd: 80, n: [1, 2] },
+  { s: '🪐', px: 18, c: '#B8FFDA', g: 'rgba(184,255,218,0.2)', spd: 22, n: [1, 1] },
 ]
 
 const TRAIL_CHARS = ['·', '°', '*', '.']
@@ -28,7 +29,10 @@ class Rocket implements DraggableEntity {
     this.freq = rand(0.2, 0.5)
     this.amp = rand(10, 30)
     this.cellW = measureCell(ctx, def.px)
-    this.fishW = def.s.length * this.cellW
+    ctx.save()
+    ctx.font = `${def.px}px ${CANVAS_FONT}`
+    this.fishW = ctx.measureText(def.s).width
+    ctx.restore()
   }
 
   get chars() { return this.dir < 0 ? flip(this.spec.s) : this.spec.s }
@@ -51,7 +55,7 @@ class Rocket implements DraggableEntity {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
-    ctx.font = `${this.spec.px}px "JetBrains Mono", monospace`
+    ctx.font = `${this.spec.px}px ${CANVAS_FONT}`
     ctx.fillStyle = this.dragging ? '#FFFFFF' : this.spec.c
     ctx.shadowColor = this.dragging ? 'rgba(255,255,255,0.9)' : this.spec.g
     ctx.shadowBlur = this.dragging ? 24 : 15
@@ -83,7 +87,7 @@ class Star {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.save()
     ctx.globalAlpha = this.a * (0.5 + 0.5 * Math.sin(this.phase))
-    ctx.font = `${this.sz}px "JetBrains Mono", monospace`
+    ctx.font = `${this.sz}px ${CANVAS_FONT}`
     ctx.fillStyle = this.col; ctx.shadowColor = this.col; ctx.shadowBlur = 4
     ctx.fillText(this.ch, this.x, this.y)
     ctx.restore()
