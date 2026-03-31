@@ -544,14 +544,10 @@ export function TerminalScene({ scene }: Props) {
     setActiveTab(tab)
     if (tab === 'auto') {
       setLines([]); scriptIdxRef.current = 0; runAuto()
-    } else if (tab === 'draw') {
-      stopAuto(); setLines([]); setTyped('')
-      setPromptPath('~/portfolio/draw')
-      setTimeout(() => drawInputRef.current?.focus(), 50)
     } else {
       showSection(tab)
     }
-  }, [runAuto, showSection, stopAuto])
+  }, [runAuto, showSection])
 
   // ── Mount ─────────────────────────────────────────────────────────────────
 
@@ -575,8 +571,6 @@ export function TerminalScene({ scene }: Props) {
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
-
-  const isDrawMode = activeTab === 'draw'
 
   return (
     <>
@@ -604,6 +598,34 @@ export function TerminalScene({ scene }: Props) {
         <div style={styles.terminalBody}>
           <canvas ref={canvasRef} style={styles.canvas} />
           {scene === 'aquarium' && <div style={styles.waterSurface} />}
+
+          {/* Draw pill — top-left, always visible */}
+          <div style={styles.drawPill}>
+            <span style={styles.drawPillIcon}>✏</span>
+            <input
+              ref={drawInputRef}
+              type="text"
+              value={drawInput}
+              onChange={e => setDrawInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') { spawnWord(drawInput); setDrawInput('') } }}
+              placeholder="spawn a word…"
+              style={styles.drawPillInput}
+              autoComplete="off"
+              spellCheck={false}
+              inputMode="text"
+            />
+            {drawInput.trim() && (
+              <button
+                onPointerDown={e => { e.preventDefault(); spawnWord(drawInput); setDrawInput('') }}
+                style={styles.drawPillBtn}
+              >+</button>
+            )}
+            {wordList.length > 0 && (
+              <button onPointerDown={e => { e.preventDefault(); clearWords() }} style={styles.drawPillClear}>
+                {wordList.length}✕
+              </button>
+            )}
+          </div>
 
           {/* Scene switcher — floats inside the canvas, top-right */}
           <div style={styles.sceneBtns}>
@@ -643,15 +665,6 @@ export function TerminalScene({ scene }: Props) {
                 </button>
               ))}
               <button
-                onClick={() => switchTab('draw')}
-                style={{
-                  ...styles.tab,
-                  ...(isDrawMode ? styles.tabDrawActive : styles.tabDraw),
-                }}
-              >
-                ✏ draw
-              </button>
-              <button
                 onClick={toggleSound}
                 style={{ ...styles.tab, marginLeft: 'auto', opacity: soundOn ? 1 : 0.5 }}
                 title={soundOn ? 'Mute' : 'Enable ambient audio'}
@@ -661,77 +674,29 @@ export function TerminalScene({ scene }: Props) {
             </div>
 
             {/* Terminal output */}
-            {isDrawMode ? (
-              <div style={styles.tlines}>
-                {wordList.length === 0 ? (
-                  <div style={{ ...styles.tline, color: '#00994F', opacity: 0.75 }}>
-                    type words, phrases, or emoji below — press Enter to spawn them into the scene. drag & throw.
+            <div style={styles.tlines}>
+              {lines.map((line, i) =>
+                line.href ? (
+                  <div key={i} style={{ ...styles.tline, ...parseStyle(line.cls) }}>
+                    <a href={line.href} target="_blank" rel="noopener noreferrer" style={styles.tlineLink}>{line.text}</a>
                   </div>
                 ) : (
-                  <>
-                    <div style={{ ...styles.tline, color: '#00994F' }}>
-                      {wordList.length} entit{wordList.length === 1 ? 'y' : 'ies'} swimming
-                    </div>
-                    {wordList.map((w, i) => (
-                      <div key={i} style={{ ...styles.tline, color: '#FF6B35' }}>~ {w}</div>
-                    ))}
-                  </>
-                )}
-                {wordList.length > 0 && (
-                  <button
-                    onClick={clearWords}
-                    style={{ ...styles.tab, marginTop: 6, ...styles.tabDraw }}
-                  >
-                    clear scene
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div style={styles.tlines}>
-                {lines.map((line, i) =>
-                  line.href ? (
-                    <div key={i} style={{ ...styles.tline, ...parseStyle(line.cls) }}>
-                      <a href={line.href} target="_blank" rel="noopener noreferrer" style={styles.tlineLink}>{line.text}</a>
-                    </div>
-                  ) : (
-                    <div key={i} style={{ ...styles.tline, ...parseStyle(line.cls) }}>{line.text || '\u00A0'}</div>
-                  )
-                )}
-              </div>
-            )}
+                  <div key={i} style={{ ...styles.tline, ...parseStyle(line.cls) }}>{line.text || '\u00A0'}</div>
+                )
+              )}
+            </div>
 
             {/* Prompt */}
-            {isDrawMode ? (
-              <div style={styles.promptLine}>
-                <span style={{ color: '#FF6B35' }}>spawn</span>
-                <span style={{ color: '#00994F', margin: '0 6px 0 2px' }}>~&gt;</span>
-                <input
-                  ref={drawInputRef}
-                  type="text"
-                  value={drawInput}
-                  onChange={e => setDrawInput(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter')  { spawnWord(drawInput); setDrawInput('') }
-                    if (e.key === 'Escape') { switchTab('auto') }
-                  }}
-                  placeholder="type anything, press Enter…"
-                  style={styles.drawInput}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-              </div>
-            ) : (
-              <div style={styles.promptLine}>
-                <span style={{ color: '#00FF87' }}>kyle</span>
-                <span style={{ color: '#00994F' }}>@</span>
-                <span style={{ color: '#00FF87' }}>papke</span>
-                <span style={{ color: '#00994F' }}>:</span>
-                <span style={{ color: '#00D9FF' }}>{promptPath}</span>
-                <span style={{ color: '#00994F', margin: '0 6px 0 2px' }}>$</span>
-                <span style={{ color: '#00FF87' }}>{typed}</span>
-                <span style={styles.cursor} />
-              </div>
-            )}
+            <div style={styles.promptLine}>
+              <span style={{ color: '#00FF87' }}>kyle</span>
+              <span style={{ color: '#00994F' }}>@</span>
+              <span style={{ color: '#00FF87' }}>papke</span>
+              <span style={{ color: '#00994F' }}>:</span>
+              <span style={{ color: '#00D9FF' }}>{promptPath}</span>
+              <span style={{ color: '#00994F', margin: '0 6px 0 2px' }}>$</span>
+              <span style={{ color: '#00FF87' }}>{typed}</span>
+              <span style={styles.cursor} />
+            </div>
           </div>
 
           <div style={styles.scanlines} />
@@ -873,9 +838,40 @@ const styles = {
     borderRadius: 3, cursor: 'pointer' as const, letterSpacing: '0.04em',
     transition: 'background 0.12s, color 0.12s', userSelect: 'none' as const,
   },
-  tabActive:     { background: 'rgba(0,255,135,0.12)', borderColor: GREEN,   color: GREEN   },
-  tabDraw:       { borderColor: `rgba(255,107,53,0.35)`, color: `rgba(255,107,53,0.65)` },
-  tabDrawActive: { background: `rgba(255,107,53,0.1)`,   borderColor: ORANGE, color: ORANGE  },
+  tabActive: { background: 'rgba(0,255,135,0.12)', borderColor: GREEN, color: GREEN },
+
+  // Draw pill — always-visible input at top of canvas, left side
+  drawPill: {
+    position: 'absolute' as const, top: 10, left: 12, right: 200, zIndex: 30,
+    display: 'flex' as const, alignItems: 'center' as const, gap: 6,
+    background: 'rgba(10,12,16,0.7)',
+    backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 8, padding: '3px 6px 3px 10px',
+    minWidth: 0,
+  },
+  drawPillIcon: { color: 'rgba(255,255,255,0.3)', fontSize: 10, flexShrink: 0, lineHeight: 1 },
+  // font-size: 16px prevents iOS Safari from zooming on focus
+  drawPillInput: {
+    background: 'transparent', border: 'none', outline: 'none',
+    color: GREEN, fontFamily: FONT,
+    fontSize: 16,                   // must be ≥16px to prevent mobile zoom
+    lineHeight: 1, padding: '2px 0',
+    letterSpacing: '0.01em', flex: 1, caretColor: GREEN, minWidth: 0,
+  },
+  drawPillBtn: {
+    background: 'rgba(0,255,135,0.15)', border: '1px solid rgba(0,255,135,0.35)',
+    color: GREEN, fontFamily: FONT, fontSize: 13, fontWeight: 700,
+    width: 24, height: 24, borderRadius: 5, cursor: 'pointer' as const,
+    flexShrink: 0, display: 'flex' as const, alignItems: 'center' as const, justifyContent: 'center' as const,
+    padding: 0, lineHeight: 1,
+  },
+  drawPillClear: {
+    background: 'transparent', border: 'none',
+    color: 'rgba(255,107,53,0.6)', fontFamily: FONT, fontSize: 9,
+    cursor: 'pointer' as const, flexShrink: 0, padding: '0 2px',
+    letterSpacing: '0.02em',
+  },
 
   tlines: {
     display: 'flex' as const, flexDirection: 'column' as const, gap: 1,
@@ -892,11 +888,6 @@ const styles = {
   promptLine: {
     display: 'flex' as const, alignItems: 'center' as const, flexWrap: 'wrap' as const,
     fontSize: 12, marginTop: 4, letterSpacing: '0.02em', fontFamily: FONT, flexShrink: 0,
-  },
-  drawInput: {
-    background: 'transparent', border: 'none', outline: 'none',
-    color: GREEN, fontFamily: FONT, fontSize: 12, letterSpacing: '0.02em',
-    flex: 1, caretColor: GREEN, minWidth: 0,
   },
   cursor: {
     display: 'inline-block' as const, width: 8, height: 13,
