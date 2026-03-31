@@ -607,7 +607,7 @@ export function TerminalScene({ scene }: Props) {
               type="text"
               value={drawInput}
               onChange={e => setDrawInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') { spawnWord(drawInput); setDrawInput('') } }}
+              onKeyDown={e => { if (e.key === 'Enter') spawnWord(drawInput) }}
               placeholder="spawn a word…"
               style={styles.drawPillInput}
               autoComplete="off"
@@ -616,7 +616,7 @@ export function TerminalScene({ scene }: Props) {
             />
             {drawInput.trim() && (
               <button
-                onPointerDown={e => { e.preventDefault(); spawnWord(drawInput); setDrawInput('') }}
+                onPointerDown={e => { e.preventDefault(); spawnWord(drawInput) }}
                 style={styles.drawPillBtn}
               >+</button>
             )}
@@ -842,7 +842,7 @@ const styles = {
 
   // Draw pill — always-visible input at top of canvas, left side
   drawPill: {
-    position: 'absolute' as const, top: 10, left: 12, width: 160, zIndex: 30,
+    position: 'absolute' as const, top: 10, left: 12, width: 210, zIndex: 30,
     display: 'flex' as const, alignItems: 'center' as const, gap: 6,
     background: 'rgba(10,12,16,0.7)',
     backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
